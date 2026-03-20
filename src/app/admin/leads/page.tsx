@@ -32,8 +32,12 @@ export default async function AdminLeadsPage() {
     } else {
       leads = data;
     }
-  } catch {
-    errorMessage = "Configurarea Supabase lipsește.";
+  } catch (error) {
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else {
+      errorMessage = "Configurarea Supabase lipsește.";
+    }
   }
 
   return (
