@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { ApartmentShowcase } from "@/components/sections/ApartmentShowcase";
 import { CampaignShowcase } from "@/components/sections/CampaignShowcase";
 import { ContactStickyForm } from "@/components/sections/ContactStickyForm";
@@ -11,7 +12,9 @@ export default function Home() {
       <HeroProject />
       <WhyProject />
       <PlansFacilitiesMap />
-      <ApartmentShowcase />
+      <Suspense fallback={null}>
+        <ApartmentShowcase />
+      </Suspense>
       <CampaignShowcase />
       <ContactStickyForm />
     </main>
