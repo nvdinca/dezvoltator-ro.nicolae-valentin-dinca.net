@@ -38,3 +38,15 @@ Ambele folosesc componenta:
 - URL: `/admin/leads?key=ADMIN_LEADS_KEY`
 
 Afiseaza lead-urile salvate in Supabase, ordonate descrescator dupa data.
+
+## 6) CMS apartamente (MVP)
+
+1. Ruleaza SQL-ul din:
+   - `supabase/apartments-schema.sql`
+2. Login in admin:
+   - `/admin/login`
+3. CMS apartamente:
+   - `/admin/apartamente`
+4. API CRUD securizat:
+   - `GET/POST /api/admin/apartments`
+   - `PATCH/DELETE /api/admin/apartments/[id]`

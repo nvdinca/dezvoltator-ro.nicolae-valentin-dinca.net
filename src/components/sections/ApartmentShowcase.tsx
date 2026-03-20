@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { apartments } from "@/lib/data/apartments";
+import type { Apartment } from "@/lib/data/apartments";
 
 function formatPrice(value: number) {
   return new Intl.NumberFormat("ro-RO").format(value);
 }
 
-export function ApartmentShowcase() {
+export function ApartmentShowcase({ apartments }: { apartments: Apartment[] }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -47,7 +47,7 @@ export function ApartmentShowcase() {
 
       return roomsMatch && statusMatch && priceMatch && areaMatch;
     });
-  }, [roomsFilter, statusFilter, maxPriceFilter, minAreaFilter]);
+  }, [apartments, roomsFilter, statusFilter, maxPriceFilter, minAreaFilter]);
 
   return (
     <section className="bg-white">

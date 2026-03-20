@@ -4,7 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ApartmentDetails } from "@/components/sections/ApartmentDetails";
 import { ApartmentGallery } from "@/components/sections/ApartmentGallery";
-import { apartments, getApartmentBySlug } from "@/lib/data/apartments";
+import { apartments } from "@/lib/data/apartments";
+import { getApartmentBySlugFromDb } from "@/lib/data/apartments-db";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -16,7 +17,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const apartment = getApartmentBySlug(slug);
+  const apartment = await getApartmentBySlugFromDb(slug);
 
   if (!apartment) {
     return {
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ApartmentPage({ params }: PageProps) {
   const { slug } = await params;
-  const apartment = getApartmentBySlug(slug);
+  const apartment = await getApartmentBySlugFromDb(slug);
 
   if (!apartment) {
     notFound();
