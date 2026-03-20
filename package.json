@@ -10,10 +10,12 @@
     "images:optimize": "node scripts/convert-images-to-webp.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.99.3",
     "next": "16.2.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

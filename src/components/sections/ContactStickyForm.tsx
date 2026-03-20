@@ -1,3 +1,5 @@
+import { LeadCaptureForm } from "@/components/forms/LeadCaptureForm";
+
 export function ContactStickyForm() {
   return (
     <section id="contact" className="bg-white">
@@ -19,53 +21,9 @@ export function ContactStickyForm() {
           </p>
         </div>
 
-        <form className="rounded-2xl border border-black/10 bg-zinc-50 p-7 shadow-sm">
-          <label
-            className="mb-2 block text-sm font-medium text-black/80"
-            htmlFor="name"
-          >
-            Nume complet
-          </label>
-          <input
-            id="name"
-            type="text"
-            className="mb-4 w-full rounded-md border border-black/15 bg-white px-3 py-2.5 text-sm outline-none ring-0 focus:border-black/30"
-            placeholder="Ex: Popescu Andrei"
-          />
-
-          <label
-            className="mb-2 block text-sm font-medium text-black/80"
-            htmlFor="phone"
-          >
-            Telefon
-          </label>
-          <input
-            id="phone"
-            type="tel"
-            className="mb-4 w-full rounded-md border border-black/15 bg-white px-3 py-2.5 text-sm outline-none ring-0 focus:border-black/30"
-            placeholder="Ex: 07xx xxx xxx"
-          />
-
-          <label
-            className="mb-2 block text-sm font-medium text-black/80"
-            htmlFor="message"
-          >
-            Mesaj (optional)
-          </label>
-          <textarea
-            id="message"
-            rows={4}
-            className="mb-5 w-full rounded-md border border-black/15 bg-white px-3 py-2.5 text-sm outline-none ring-0 focus:border-black/30"
-            placeholder="Tip apartament / buget / termen mutare"
-          />
-
-          <button
-            type="button"
-            className="w-full rounded-md bg-black px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-zinc-800"
-          >
-            Trimite solicitarea
-          </button>
-        </form>
+        <div className="rounded-2xl border border-black/10 bg-zinc-50 p-7 shadow-sm">
+          <LeadCaptureForm source="landing-home" buttonLabel="Trimite solicitarea" />
+        </div>
       </div>
     </section>
   );

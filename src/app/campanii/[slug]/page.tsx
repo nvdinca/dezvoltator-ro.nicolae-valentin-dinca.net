@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { LeadCaptureForm } from "@/components/forms/LeadCaptureForm";
 import { campaigns, getCampaignBySlug } from "@/lib/data/campaigns";
 
 type PageProps = {
@@ -91,24 +92,13 @@ export default async function CampaignPage({ params }: PageProps) {
               <p className="mt-2 text-sm leading-6 text-black/70">
                 Formular simplu pentru conversii rapide si lead-uri relevante.
               </p>
-              <form className="mt-4 space-y-3">
-                <input
-                  type="text"
-                  placeholder="Nume complet"
-                  className="w-full rounded-md border border-black/15 bg-white px-3 py-2.5 text-sm outline-none focus:border-black/30"
+              <div className="mt-4">
+                <LeadCaptureForm
+                  source={`campanie-${campaign.slug}`}
+                  buttonLabel={campaign.ctaText}
+                  compact
                 />
-                <input
-                  type="tel"
-                  placeholder="Telefon"
-                  className="w-full rounded-md border border-black/15 bg-white px-3 py-2.5 text-sm outline-none focus:border-black/30"
-                />
-                <button
-                  type="button"
-                  className="w-full rounded-md bg-black px-4 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800"
-                >
-                  {campaign.ctaText}
-                </button>
-              </form>
+              </div>
               <ul className="mt-5 space-y-2">
                 {campaign.trustPoints.map((point) => (
                   <li key={point} className="text-sm text-black/65">
