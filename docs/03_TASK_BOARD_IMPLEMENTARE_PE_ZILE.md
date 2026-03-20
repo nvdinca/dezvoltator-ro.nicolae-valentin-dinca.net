@@ -106,12 +106,12 @@ Asiguri masurare completa a conversiilor si flux clar pentru lead-uri.
 Ridici produsul la nivel premium: performanta, consistenta si detalii de incredere.
 
 ### Task-uri
-- [ ] Ajusteaza tipografie, spacing si consistenta vizuala
-- [ ] Verifica claritatea CTA-urilor pe toate paginile
-- [ ] Optimizeaza metadata SEO (title, description, Open Graph)
-- [ ] Adauga favicon si branding de baza
-- [ ] Ruleaza audit Lighthouse si rezolva punctele majore
-- [ ] Test final pe dispozitive diferite
+- [x] Ajusteaza tipografie, spacing si consistenta vizuala
+- [x] Verifica claritatea CTA-urilor pe toate paginile
+- [x] Optimizeaza metadata SEO (title, description, Open Graph)
+- [x] Adauga favicon si branding de baza
+- [x] Ruleaza audit Lighthouse si rezolva punctele majore
+- [x] Test final pe dispozitive diferite
 
 ### Criteriu de gata
 - Site-ul arata premium, se incarca rapid si este pregatit de prezentare.

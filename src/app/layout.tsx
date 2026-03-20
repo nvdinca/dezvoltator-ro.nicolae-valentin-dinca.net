@@ -20,6 +20,7 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  applicationName: "NVD Portofoliu Imobiliar",
   title: "Nicolae-Valentin Dinca - Portofoliu - Dezvoltator Imobiliar - România",
   description:
     "Website de prezentare pentru dezvoltatori imobiliari din România, cu pagini moderne pentru ansambluri rezidențiale, apartamente și conversii.",
@@ -55,6 +56,12 @@ export const metadata: Metadata = {
       "Website de prezentare pentru dezvoltatori imobiliari din România, cu focus pe conversii și design premium.",
     images: ["/og-image.jpg"],
   },
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -65,6 +72,7 @@ export default function RootLayout({
   return (
     <html
       lang="ro"
+      data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

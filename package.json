@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "images:optimize": "node scripts/convert-images-to-webp.mjs"
+    "images:optimize": "node scripts/convert-images-to-webp.mjs",
+    "images:hero-variants": "node scripts/generate-hero-variants.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.99.3",

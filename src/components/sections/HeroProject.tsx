@@ -1,23 +1,28 @@
 "use client";
 
+import Image from "next/image";
 import { trackEvent } from "@/lib/analytics/track";
 
 const heroImages = [
   {
     label: "Randare exterioara",
-    url: "/images/hero/hero-01.webp",
+    url: "/images/hero/variants/hero-01-1200.webp",
+    quality: 78,
   },
   {
     label: "Zona verde privata",
-    url: "/images/hero/hero-02.webp",
+    url: "/images/hero/variants/hero-02-1200.webp",
+    quality: 76,
   },
   {
     label: "Interior premium",
-    url: "/images/hero/hero-03.webp",
+    url: "/images/hero/variants/hero-03-800.webp",
+    quality: 74,
   },
   {
     label: "Spatii comune",
-    url: "/images/hero/hero-04.webp",
+    url: "/images/hero/variants/hero-04-800.webp",
+    quality: 72,
   },
 ];
 
@@ -69,14 +74,19 @@ export function HeroProject() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {heroImages.map((image) => (
+          {heroImages.map((image, index) => (
             <div
               key={image.label}
               className="group relative h-44 overflow-hidden rounded-2xl border border-white/10 shadow-xl shadow-black/30 sm:h-56"
             >
-              <div
-                className="absolute inset-0 bg-cover bg-center transition duration-500 group-hover:scale-105"
-                style={{ backgroundImage: `url("${image.url}")` }}
+              <Image
+                src={image.url}
+                alt={image.label}
+                fill
+                sizes="(max-width: 640px) 100vw, 33vw"
+                className="object-cover transition duration-500 group-hover:scale-105"
+                priority={index === 0}
+                quality={image.quality}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-black/15" />
               <p className="absolute bottom-3 left-3 text-sm font-medium text-white/90">
