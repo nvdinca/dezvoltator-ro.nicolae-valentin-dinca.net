@@ -78,6 +78,18 @@ export default async function AdminLeadsPage(props: { searchParams: SearchParams
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl font-semibold tracking-tight">CRM Leads</h1>
         <div className="flex items-center gap-4">
+          <Link
+            href="/admin/leads"
+            className="rounded-md bg-black px-3 py-1.5 text-xs font-semibold text-white"
+          >
+            CRM Leads
+          </Link>
+          <Link
+            href="/admin/apartamente"
+            className="rounded-md border border-black/15 px-3 py-1.5 text-xs font-semibold text-black/75 hover:bg-zinc-50"
+          >
+            CMS Apartamente
+          </Link>
           <AdminLogoutButton />
           <Link href="/" className="text-sm text-black/70 hover:text-black">
             Înapoi la site

@@ -40,6 +40,14 @@ export default function AdminLoginPage() {
       <p className="mt-2 text-sm text-black/65">
         Introdu cheia de administrare pentru CRM.
       </p>
+      <div className="mt-4 flex items-center gap-2 text-xs">
+        <span className="rounded-md border border-black/15 px-2 py-1 text-black/70">
+          CRM Leads: /admin/leads
+        </span>
+        <span className="rounded-md border border-black/15 px-2 py-1 text-black/70">
+          CMS Apartamente: /admin/apartamente
+        </span>
+      </div>
 
       <form onSubmit={onSubmit} className="mt-6 rounded-xl border border-black/10 bg-white p-6">
         <label className="mb-2 block text-sm font-medium text-black/80" htmlFor="admin-key">
