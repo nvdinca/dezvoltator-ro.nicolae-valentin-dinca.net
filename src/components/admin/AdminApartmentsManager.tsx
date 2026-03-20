@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
+import { apartmentSchema } from "@/lib/validations/apartment";
 
 type ApartmentRecord = {
   id: string;
@@ -32,6 +33,39 @@ type ApartmentFormState = {
   plan2d: string;
   plan3d: string;
 };
+
+function FormField({
+  label,
+  htmlFor,
+  required,
+  hint,
+  children,
+}: {
+  label: string;
+  htmlFor: string;
+  /** Implicit: obligatoriu (afișează *). Pune `false` pentru câmpuri opționale. */
+  required?: boolean;
+  hint?: string;
+  children: ReactNode;
+}) {
+  const isRequired = required !== false;
+  return (
+    <div className="flex flex-col gap-1">
+      <label htmlFor={htmlFor} className="text-sm font-medium text-black/85">
+        {label}
+        {isRequired ? (
+          <span className="ml-0.5 text-rose-600" title="Obligatoriu">
+            *
+          </span>
+        ) : (
+          <span className="ml-1 text-xs font-normal text-black/45">(opțional)</span>
+        )}
+      </label>
+      {children}
+      {hint ? <p className="text-xs leading-snug text-black/55">{hint}</p> : null}
+    </div>
+  );
+}
 
 const initialForm: ApartmentFormState = {
   slug: "",
@@ -88,6 +122,11 @@ export function AdminApartmentsManager() {
     setLoading(true);
     setMessage("");
 
+    const images = form.imagesText
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+
     const payload = {
       slug: form.slug,
       title: form.title,
@@ -98,13 +137,18 @@ export function AdminApartmentsManager() {
       areaBuilt: form.areaBuilt,
       availability: form.availability,
       shortDescription: form.shortDescription,
-      images: form.imagesText
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean),
+      images,
       plan2d: form.plan2d,
       plan3d: form.plan3d,
     };
+
+    const parsed = apartmentSchema.safeParse(payload);
+    if (!parsed.success) {
+      const first = parsed.error.issues[0];
+      setMessage(first?.message ?? "Verifică câmpurile marcate cu *.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch(
@@ -292,106 +336,274 @@ export function AdminApartmentsManager() {
           </div>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-2">
-          <input
-            placeholder="Slug"
-            value={form.slug}
-            onChange={(e) => setForm((s) => ({ ...s, slug: e.target.value }))}
-            className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
-          />
-          <input
-            placeholder="Titlu"
-            value={form.title}
-            onChange={(e) => setForm((s) => ({ ...s, title: e.target.value }))}
-            className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
-          />
-          <input
-            placeholder="Camere"
-            value={form.rooms}
-            onChange={(e) => setForm((s) => ({ ...s, rooms: e.target.value }))}
-            className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
-          />
-          <input
-            placeholder="Etaj"
-            value={form.floor}
-            onChange={(e) => setForm((s) => ({ ...s, floor: e.target.value }))}
-            className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
-          />
-          <input
-            placeholder="Preț EUR"
-            value={form.priceEur}
-            onChange={(e) => setForm((s) => ({ ...s, priceEur: e.target.value }))}
-            className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
-          />
-          <select
-            value={form.availability}
-            onChange={(e) =>
-              setForm((s) => ({
-                ...s,
-                availability: e.target.value as ApartmentFormState["availability"],
-              }))
-            }
-            className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
-          >
-            <option value="disponibil">disponibil</option>
-            <option value="rezervat">rezervat</option>
-            <option value="vandut">vandut</option>
-          </select>
-          <input
-            placeholder="Suprafață utilă"
-            value={form.areaUseful}
-            onChange={(e) => setForm((s) => ({ ...s, areaUseful: e.target.value }))}
-            className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
-          />
-          <input
-            placeholder="Suprafață construită"
-            value={form.areaBuilt}
-            onChange={(e) => setForm((s) => ({ ...s, areaBuilt: e.target.value }))}
-            className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
-          />
-          <input
-            placeholder="Plan 2D (URL)"
-            value={form.plan2d}
-            onChange={(e) => setForm((s) => ({ ...s, plan2d: e.target.value }))}
-            className="rounded-md border border-black/15 px-3 py-2.5 text-sm md:col-span-2"
-          />
-          <input
-            placeholder="Plan 3D (URL)"
-            value={form.plan3d}
-            onChange={(e) => setForm((s) => ({ ...s, plan3d: e.target.value }))}
-            className="rounded-md border border-black/15 px-3 py-2.5 text-sm md:col-span-2"
-          />
-          <textarea
-            placeholder="Descriere scurtă"
-            value={form.shortDescription}
-            onChange={(e) => setForm((s) => ({ ...s, shortDescription: e.target.value }))}
-            className="rounded-md border border-black/15 px-3 py-2.5 text-sm md:col-span-2"
-            rows={3}
-          />
-          <textarea
-            placeholder="Imagini (un URL pe linie)"
-            value={form.imagesText}
-            onChange={(e) => setForm((s) => ({ ...s, imagesText: e.target.value }))}
-            className="rounded-md border border-black/15 px-3 py-2.5 text-sm md:col-span-2"
-            rows={4}
-          />
-          <div className="rounded-md border border-black/15 bg-zinc-50 p-3 md:col-span-2">
-            <label className="mb-2 block text-sm font-medium text-black/80">
-              Upload poze (multi-image)
-            </label>
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              multiple
-              onChange={(event) => uploadImages(event.target.files)}
-              className="block w-full text-sm text-black/75 file:mr-3 file:rounded-md file:border file:border-black/15 file:bg-white file:px-3 file:py-2 file:text-sm"
-              disabled={uploading}
-            />
-            <p className="mt-2 text-xs text-black/55">
-              Formate acceptate: JPG, PNG, WebP. Maxim 8MB/fișier.
-            </p>
-          </div>
+        <div className="mb-6 rounded-lg border border-amber-200/80 bg-amber-50/80 px-4 py-3 text-sm text-black/80">
+          <p className="font-semibold text-black/90">Ce contează ca să salvezi corect</p>
+          <ul className="mt-2 list-inside list-disc space-y-1 text-black/75">
+            <li>
+              <strong>Obligatoriu:</strong> toate câmpurile cu * — inclusiv{" "}
+              <strong>minim 1 imagine</strong>, <strong>plan 2D și 3D</strong> (URL valid sau
+              cale în site, ex. <code className="rounded bg-black/5 px-1">/images/...</code>).
+            </li>
+            <li>
+              <strong>Slug:</strong> unic, fără spații — devine adresa{" "}
+              <code className="rounded bg-black/5 px-1">/apartamente/slug-ul-tau</code>.
+            </li>
+            <li>
+              <strong>Imagini:</strong> prima din listă = <strong>cover</strong> (sau folosește
+              „Setează ca cover” / drag-and-drop).
+            </li>
+          </ul>
+          <p className="mt-2 text-xs text-black/60">
+            După ce apeși „Creează apartament”, apartamentul apare pe site doar dacă toate
+            regulile de mai sus sunt îndeplinite (validare înainte de trimitere).
+          </p>
         </div>
+
+        <fieldset className="space-y-4 border-0 p-0">
+          <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-black/55">
+            1. Identificare
+          </legend>
+          <div className="grid gap-4 md:grid-cols-2">
+            <FormField
+              label="Slug (identificator URL)"
+              htmlFor="apt-slug"
+              required
+              hint="Ex: apartament-d2 — litere mici, cifre, cratimă. Minim 3 caractere."
+            >
+              <input
+                id="apt-slug"
+                name="slug"
+                autoComplete="off"
+                placeholder="ex. apartament-d2"
+                value={form.slug}
+                onChange={(e) => setForm((s) => ({ ...s, slug: e.target.value }))}
+                className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
+              />
+            </FormField>
+            <FormField
+              label="Titlu afișat"
+              htmlFor="apt-title"
+              required
+              hint="Numele apartamentului pe listă și pe pagina de detaliu."
+            >
+              <input
+                id="apt-title"
+                name="title"
+                placeholder="ex. Apartament D2 — vedere parc"
+                value={form.title}
+                onChange={(e) => setForm((s) => ({ ...s, title: e.target.value }))}
+                className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
+              />
+            </FormField>
+          </div>
+        </fieldset>
+
+        <fieldset className="mt-6 space-y-4 border-0 border-t border-black/10 pt-6">
+          <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-black/55">
+            2. Detalii și preț
+          </legend>
+          <div className="grid gap-4 md:grid-cols-2">
+            <FormField
+              label="Număr camere"
+              htmlFor="apt-rooms"
+              required
+              hint="Întreg, 1–10."
+            >
+              <input
+                id="apt-rooms"
+                name="rooms"
+                inputMode="numeric"
+                placeholder="2"
+                value={form.rooms}
+                onChange={(e) => setForm((s) => ({ ...s, rooms: e.target.value }))}
+                className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
+              />
+            </FormField>
+            <FormField
+              label="Etaj"
+              htmlFor="apt-floor"
+              required
+              hint="Întreg, 0 = parter."
+            >
+              <input
+                id="apt-floor"
+                name="floor"
+                inputMode="numeric"
+                placeholder="0"
+                value={form.floor}
+                onChange={(e) => setForm((s) => ({ ...s, floor: e.target.value }))}
+                className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
+              />
+            </FormField>
+            <FormField
+              label="Preț (EUR)"
+              htmlFor="apt-price"
+              required
+              hint="Număr întreg (fără punct sau virgulă)."
+            >
+              <input
+                id="apt-price"
+                name="priceEur"
+                inputMode="numeric"
+                placeholder="185000"
+                value={form.priceEur}
+                onChange={(e) => setForm((s) => ({ ...s, priceEur: e.target.value }))}
+                className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
+              />
+            </FormField>
+            <FormField label="Disponibilitate" htmlFor="apt-availability" required>
+              <select
+                id="apt-availability"
+                name="availability"
+                value={form.availability}
+                onChange={(e) =>
+                  setForm((s) => ({
+                    ...s,
+                    availability: e.target.value as ApartmentFormState["availability"],
+                  }))
+                }
+                className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
+              >
+                <option value="disponibil">disponibil</option>
+                <option value="rezervat">rezervat</option>
+                <option value="vandut">vândut</option>
+              </select>
+            </FormField>
+            <FormField
+              label="Suprafață utilă (m²)"
+              htmlFor="apt-area-useful"
+              required
+              hint="Număr pozitiv (ex: 72.5)."
+            >
+              <input
+                id="apt-area-useful"
+                name="areaUseful"
+                inputMode="decimal"
+                placeholder="72.5"
+                value={form.areaUseful}
+                onChange={(e) => setForm((s) => ({ ...s, areaUseful: e.target.value }))}
+                className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
+              />
+            </FormField>
+            <FormField
+              label="Suprafață construită (m²)"
+              htmlFor="apt-area-built"
+              required
+              hint="Număr pozitiv."
+            >
+              <input
+                id="apt-area-built"
+                name="areaBuilt"
+                inputMode="decimal"
+                placeholder="95"
+                value={form.areaBuilt}
+                onChange={(e) => setForm((s) => ({ ...s, areaBuilt: e.target.value }))}
+                className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
+              />
+            </FormField>
+          </div>
+        </fieldset>
+
+        <fieldset className="mt-6 space-y-4 border-0 border-t border-black/10 pt-6">
+          <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-black/55">
+            3. Galerie foto
+          </legend>
+          <FormField
+            label="Lista de imagini (URL-uri)"
+            htmlFor="apt-images"
+            required
+            hint="Un URL pe linie. Poți lipi linkuri sau folosi upload-ul de mai jos — se adaugă automat aici. Minim 1 URL."
+          >
+            <textarea
+              id="apt-images"
+              name="images"
+              placeholder={"https://...\nhttps://..."}
+              value={form.imagesText}
+              onChange={(e) => setForm((s) => ({ ...s, imagesText: e.target.value }))}
+              className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
+              rows={4}
+            />
+          </FormField>
+          <div className="rounded-md border border-black/15 bg-zinc-50 p-4">
+            <FormField
+              label="Încarcă imagini de pe calculator"
+              htmlFor="apt-upload"
+              required={false}
+              hint="Opțional dacă ai deja URL-uri mai sus. JPG, PNG, WebP — max. 8MB/fișier."
+            >
+              <input
+                id="apt-upload"
+                name="upload"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                onChange={(event) => uploadImages(event.target.files)}
+                className="block w-full text-sm text-black/75 file:mr-3 file:rounded-md file:border file:border-black/15 file:bg-white file:px-3 file:py-2 file:text-sm"
+                disabled={uploading}
+              />
+            </FormField>
+          </div>
+        </fieldset>
+
+        <fieldset className="mt-6 space-y-4 border-0 border-t border-black/10 pt-6">
+          <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-black/55">
+            4. Planuri
+          </legend>
+          <div className="grid gap-4 md:grid-cols-2">
+            <FormField
+              label="Plan 2D"
+              htmlFor="apt-plan-2d"
+              required
+              hint="URL complet sau cale în public, ex. /images/plan-2d.webp"
+            >
+              <input
+                id="apt-plan-2d"
+                name="plan2d"
+                placeholder="https://... sau /images/..."
+                value={form.plan2d}
+                onChange={(e) => setForm((s) => ({ ...s, plan2d: e.target.value }))}
+                className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
+              />
+            </FormField>
+            <FormField
+              label="Plan 3D / randare"
+              htmlFor="apt-plan-3d"
+              required
+              hint="La fel ca planul 2D — obligatoriu pentru afișare corectă."
+            >
+              <input
+                id="apt-plan-3d"
+                name="plan3d"
+                placeholder="https://... sau /images/..."
+                value={form.plan3d}
+                onChange={(e) => setForm((s) => ({ ...s, plan3d: e.target.value }))}
+                className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
+              />
+            </FormField>
+          </div>
+        </fieldset>
+
+        <fieldset className="mt-6 space-y-4 border-0 border-t border-black/10 pt-6">
+          <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-black/55">
+            5. Descriere
+          </legend>
+          <FormField
+            label="Descriere scurtă"
+            htmlFor="apt-description"
+            required
+            hint="Minim 8 caractere, maxim ~300 — rezumat pentru carduri și SEO."
+          >
+            <textarea
+              id="apt-description"
+              name="shortDescription"
+              placeholder="2–3 propoziții despre apartament..."
+              value={form.shortDescription}
+              onChange={(e) => setForm((s) => ({ ...s, shortDescription: e.target.value }))}
+              className="rounded-md border border-black/15 px-3 py-2.5 text-sm"
+              rows={3}
+            />
+          </FormField>
+        </fieldset>
 
         {imageList.length > 0 ? (
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
