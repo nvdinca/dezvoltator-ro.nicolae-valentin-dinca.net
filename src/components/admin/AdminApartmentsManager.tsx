@@ -129,6 +129,25 @@ export function AdminApartmentsManager() {
     }
   }
 
+  async function seedDemoData() {
+    setLoading(true);
+    setMessage("");
+    try {
+      const response = await fetch("/api/admin/apartments/seed", { method: "POST" });
+      const data = await response.json();
+      if (!response.ok) {
+        setMessage(data?.message ?? "Nu am putut popula datele demo.");
+      } else {
+        setMessage(data?.message ?? "Datele demo au fost încărcate.");
+        await loadItems();
+      }
+    } catch {
+      setMessage("Eroare de rețea la popularea datelor demo.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function remove(id: string) {
     if (!confirm("Sigur vrei să ștergi acest apartament?")) return;
     setLoading(true);
@@ -178,14 +197,24 @@ export function AdminApartmentsManager() {
           <h2 className="text-xl font-semibold">
             {editingId ? "Editează apartament" : "Adaugă apartament"}
           </h2>
-          <button
-            type="button"
-            onClick={loadItems}
-            className="rounded-md border border-black/15 px-3 py-2 text-sm"
-            disabled={loading}
-          >
-            Reîncarcă listă
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={seedDemoData}
+              className="rounded-md border border-black/15 px-3 py-2 text-sm"
+              disabled={loading}
+            >
+              Încarcă date demo (3)
+            </button>
+            <button
+              type="button"
+              onClick={loadItems}
+              className="rounded-md border border-black/15 px-3 py-2 text-sm"
+              disabled={loading}
+            >
+              Reîncarcă listă
+            </button>
+          </div>
         </div>
 
         <div className="grid gap-3 md:grid-cols-2">
