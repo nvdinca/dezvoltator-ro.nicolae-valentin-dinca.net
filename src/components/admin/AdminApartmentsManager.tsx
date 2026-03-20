@@ -54,6 +54,8 @@ export function AdminApartmentsManager() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
 
   const sortedItems = useMemo(
     () =>
@@ -172,6 +174,77 @@ export function AdminApartmentsManager() {
     }
   }
 
+  function getImageList() {
+    return form.imagesText
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+  }
+
+  function setImageList(urls: string[]) {
+    setForm((s) => ({ ...s, imagesText: urls.join("\n") }));
+  }
+
+  function moveImage(fromIndex: number, toIndex: number) {
+    if (fromIndex === toIndex) return;
+    const list = getImageList();
+    if (fromIndex < 0 || toIndex < 0 || fromIndex >= list.length || toIndex >= list.length) return;
+
+    const [moved] = list.splice(fromIndex, 1);
+    list.splice(toIndex, 0, moved);
+    setImageList(list);
+  }
+
+  function setAsCover(index: number) {
+    if (index <= 0) return;
+    moveImage(index, 0);
+  }
+
+  async function uploadImages(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    setMessage("");
+
+    try {
+      const formData = new FormData();
+      Array.from(files).forEach((file) => formData.append("images", file));
+
+      const response = await fetch("/api/admin/apartments/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setMessage(data?.message ?? "Nu am putut încărca imaginile.");
+      } else {
+        const merged = [...getImageList(), ...(data.urls ?? [])];
+        setImageList(merged);
+        setMessage("Imaginile au fost încărcate.");
+      }
+    } catch {
+      setMessage("Eroare de rețea la upload.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function deleteImage(url: string) {
+    const current = getImageList();
+    setImageList(current.filter((item) => item !== url));
+
+    if (!url.includes("/storage/v1/object/public/")) return;
+
+    try {
+      await fetch("/api/admin/apartments/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+    } catch {
+      // Ignore storage delete errors; URL already removed from form.
+    }
+  }
+
   function edit(item: ApartmentRecord) {
     setEditingId(item.id);
     setForm({
@@ -189,6 +262,8 @@ export function AdminApartmentsManager() {
       plan3d: item.plan_3d,
     });
   }
+
+  const imageList = getImageList();
 
   return (
     <div className="space-y-6">
@@ -300,13 +375,108 @@ export function AdminApartmentsManager() {
             className="rounded-md border border-black/15 px-3 py-2.5 text-sm md:col-span-2"
             rows={4}
           />
+          <div className="rounded-md border border-black/15 bg-zinc-50 p-3 md:col-span-2">
+            <label className="mb-2 block text-sm font-medium text-black/80">
+              Upload poze (multi-image)
+            </label>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              onChange={(event) => uploadImages(event.target.files)}
+              className="block w-full text-sm text-black/75 file:mr-3 file:rounded-md file:border file:border-black/15 file:bg-white file:px-3 file:py-2 file:text-sm"
+              disabled={uploading}
+            />
+            <p className="mt-2 text-xs text-black/55">
+              Formate acceptate: JPG, PNG, WebP. Maxim 8MB/fișier.
+            </p>
+          </div>
         </div>
+
+        {imageList.length > 0 ? (
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {imageList.map((url, index) => (
+              <div
+                key={url}
+                className="overflow-hidden rounded-lg border border-black/10 bg-white"
+                draggable
+                onDragStart={() => setDraggedImageIndex(index)}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={() => {
+                  if (draggedImageIndex === null) return;
+                  moveImage(draggedImageIndex, index);
+                  setDraggedImageIndex(null);
+                }}
+                onDragEnd={() => setDraggedImageIndex(null)}
+              >
+                <div className="aspect-video bg-zinc-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt="Preview apartament"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-2 p-2">
+                  <div className="min-w-0">
+                    {index === 0 ? (
+                      <p className="mb-1 inline-block rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
+                        Cover
+                      </p>
+                    ) : null}
+                    <p className="truncate text-xs text-black/60">{url}</p>
+                  </div>
+                  <div className="flex shrink-0 flex-col items-stretch gap-1.5 sm:flex-row sm:items-center">
+                    {index === 0 ? (
+                      <span
+                        className="whitespace-nowrap rounded-md border border-emerald-200 bg-emerald-50/80 px-2 py-1 text-center text-[10px] font-medium text-emerald-800"
+                        title="Prima imagine din listă este cover-ul"
+                      >
+                        Cover actual
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        draggable={false}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setAsCover(index);
+                        }}
+                        className="whitespace-nowrap rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-100"
+                      >
+                        Setează ca cover
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      draggable={false}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteImage(url);
+                      }}
+                      className="rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-xs text-rose-700"
+                    >
+                      Șterge
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+        {imageList.length > 1 ? (
+          <p className="mt-2 text-xs text-black/55">
+            Trage și lasă imaginile pentru reordonare. Prima imagine este folosită ca cover.
+          </p>
+        ) : null}
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={save}
-            disabled={loading}
+            disabled={loading || uploading}
             className="rounded-md bg-black px-4 py-2.5 text-sm font-semibold text-white"
           >
             {editingId ? "Salvează modificări" : "Creează apartament"}

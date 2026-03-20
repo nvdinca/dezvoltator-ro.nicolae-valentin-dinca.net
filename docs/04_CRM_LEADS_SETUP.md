@@ -50,3 +50,17 @@ Afiseaza lead-urile salvate in Supabase, ordonate descrescator dupa data.
 4. API CRUD securizat:
    - `GET/POST /api/admin/apartments`
    - `PATCH/DELETE /api/admin/apartments/[id]`
+
+## 7) Upload imagini apartamente (admin)
+
+1. Ruleaza SQL-ul pentru storage:
+   - `supabase/apartments-storage.sql`
+2. Adauga in `.env.local`:
+   - `SUPABASE_APARTMENTS_BUCKET=apartments`
+3. Upload din admin:
+   - pagina: `/admin/apartamente`
+   - selectezi imagini multiple (JPG/PNG/WebP)
+   - endpoint securizat: `POST /api/admin/apartments/upload`
+4. Stergere imagine:
+   - butonul `Șterge` din preview elimina URL-ul din apartament
+   - pentru fisiere din Supabase Storage, se cheama `DELETE /api/admin/apartments/upload`
