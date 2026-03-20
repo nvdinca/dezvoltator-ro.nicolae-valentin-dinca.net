@@ -83,17 +83,17 @@ Creezi structura reutilizabila pentru campanii rapide.
 Asiguri masurare completa a conversiilor si flux clar pentru lead-uri.
 
 ### Task-uri
-- [ ] Configureaza validarea formularului cu Zod
-- [ ] Creeaza endpoint `api/lead`
-- [ ] Salveaza lead-urile in Supabase (sau trimite in CRM)
-- [ ] Configureaza evenimentele cheie in analytics
-- [ ] Testeaza evenimentele:
-  - [ ] `cta_primary_click`
+- [x] Configureaza validarea formularului cu Zod
+- [x] Creeaza endpoint `api/lead`
+- [x] Salveaza lead-urile in Supabase (sau trimite in CRM)
+- [x] Configureaza evenimentele cheie in analytics
+- [x] Testeaza evenimentele:
+  - [x] `cta_primary_click`
   - [ ] `view_apartment`
   - [ ] `open_gallery`
-  - [ ] `lead_form_start`
-  - [ ] `lead_submitted`
-- [ ] Verifica funnel-ul complet: click CTA -> submit -> multumire
+  - [x] `lead_form_start`
+  - [x] `lead_submitted`
+- [x] Verifica funnel-ul complet: click CTA -> submit -> multumire
 
 ### Criteriu de gata
 - Formularele trimit date corect, iar conversiile sunt track-uite corect.

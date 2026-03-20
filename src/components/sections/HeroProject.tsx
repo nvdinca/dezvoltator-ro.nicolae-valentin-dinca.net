@@ -1,3 +1,7 @@
+"use client";
+
+import { trackEvent } from "@/lib/analytics/track";
+
 const heroImages = [
   {
     label: "Randare exterioara",
@@ -39,12 +43,24 @@ export function HeroProject() {
           <div className="flex flex-wrap gap-3 pt-1">
             <a
               href="#contact"
+              onClick={() =>
+                trackEvent("cta_primary_click", {
+                  location: "hero",
+                  cta: "Programeaza o discutie",
+                })
+              }
               className="rounded-md bg-white px-6 py-3.5 text-sm font-semibold text-black shadow-lg shadow-black/25 transition hover:bg-zinc-200"
             >
               Programeaza o discutie
             </a>
             <a
               href="#apartamente"
+              onClick={() =>
+                trackEvent("cta_secondary_click", {
+                  location: "hero",
+                  cta: "Vezi planuri si facilitati",
+                })
+              }
               className="rounded-md border border-white/35 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
             >
               Vezi planuri si facilitati

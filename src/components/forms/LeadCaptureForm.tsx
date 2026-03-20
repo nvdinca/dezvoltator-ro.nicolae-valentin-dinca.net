@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { trackEvent } from "@/lib/analytics/track";
 
 type LeadCaptureFormProps = {
   source: string;
@@ -19,6 +20,7 @@ export function LeadCaptureForm({
   const router = useRouter();
   const [state, setState] = useState<FormState>("idle");
   const [message, setMessage] = useState<string>("");
+  const [started, setStarted] = useState(false);
 
   async function onSubmit(formData: FormData) {
     setState("sending");
@@ -47,6 +49,7 @@ export function LeadCaptureForm({
 
       setState("success");
       setMessage("Mulțumim! Te contactăm în cel mai scurt timp.");
+      trackEvent("lead_submitted", { source });
       router.push("/multumim");
     } catch {
       setState("error");
@@ -68,6 +71,12 @@ export function LeadCaptureForm({
         type="text"
         className={`${inputClass} mb-4`}
         placeholder="Ex: Popescu Andrei"
+        onFocus={() => {
+          if (!started) {
+            setStarted(true);
+            trackEvent("lead_form_start", { source });
+          }
+        }}
         required
       />
 
