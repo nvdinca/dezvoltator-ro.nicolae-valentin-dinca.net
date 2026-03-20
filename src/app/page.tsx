@@ -1,3 +1,5 @@
+import { ApartmentShowcase } from "@/components/sections/ApartmentShowcase";
+import { CampaignShowcase } from "@/components/sections/CampaignShowcase";
 import { ContactStickyForm } from "@/components/sections/ContactStickyForm";
 import { HeroProject } from "@/components/sections/HeroProject";
 import { PlansFacilitiesMap } from "@/components/sections/PlansFacilitiesMap";
@@ -9,6 +11,8 @@ export default function Home() {
       <HeroProject />
       <WhyProject />
       <PlansFacilitiesMap />
+      <ApartmentShowcase />
+      <CampaignShowcase />
       <ContactStickyForm />
     </main>
   );
